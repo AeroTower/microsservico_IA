@@ -43,7 +43,10 @@ def _limpar_formatacao_markdown(texto: str) -> str:
 
 
 def _consultar_modelo_gemini(prompt: str) -> str:
-    cliente_ia = genai.Client(api_key=API_KEY)
+    cliente_ia = genai.Client(
+        api_key=API_KEY,
+        http_options=types.HttpOptions(api_version="v1beta"),
+    )
     resposta = cliente_ia.models.generate_content(
         model=MODELO_GEMINI,
         contents=prompt,
