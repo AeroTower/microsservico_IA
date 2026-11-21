@@ -4,6 +4,9 @@ from google.genai import types
 from config import API_KEY
 from models import LeituraSensores
 
+MODELO_GEMINI = "gemini-2.5-flash"
+
+
 def _gerar_prompt_agronomico(dados: LeituraSensores) -> str:
     return f"""
     Você é um agrônomo especialista em hidroponia.
@@ -31,29 +34,36 @@ def _gerar_prompt_agronomico(dados: LeituraSensores) -> str:
     }}
     """
 
+
 def _limpar_formatacao_markdown(texto: str) -> str:
-    texto = texto.strip()
-    if texto.startswith("```"):
-        texto = texto.strip("`").replace("json\n", "", 1)
-    return texto
+    texto_sem_espacos = texto.strip()
+    if texto_sem_espacos.startswith("```"):
+        texto_sem_espacos = texto_sem_espacos.strip("`").replace("json\n", "", 1).strip()
+    return texto_sem_espacos
+
+
+def _consultar_modelo_gemini(prompt: str) -> str:
+    cliente_ia = genai.Client(api_key=API_KEY)
+    resposta = cliente_ia.models.generate_content(
+        model=MODELO_GEMINI,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+        ),
+    )
+    return resposta.text
+
+
+def _converter_resposta_json(resposta_bruta: str) -> dict:
+    texto_limpo = _limpar_formatacao_markdown(resposta_bruta)
+    return json.loads(texto_limpo)
+
 
 def analisar_dados_cultivo(dados: LeituraSensores) -> dict:
     # Checagem de segurança tardia: Se a Azure falhou em ler a chave, a API avisa em vez de quebrar
     if not API_KEY:
         raise ValueError("A chave GEMINI_API_KEY não está configurada no ambiente da Azure.")
 
-    # Inicia o cliente do NOVO SDK
-    cliente_ia = genai.Client(api_key=API_KEY)
     prompt = _gerar_prompt_agronomico(dados)
-    
-    # Chama o modelo usando a nova estrutura do Google
-    resposta_bruta = cliente_ia.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-        )
-    )
-    
-    texto_limpo = _limpar_formatacao_markdown(resposta_bruta.text)
-    return json.loads(texto_limpo)
+    resposta_bruta = _consultar_modelo_gemini(prompt)
+    return _converter_resposta_json(resposta_bruta)
