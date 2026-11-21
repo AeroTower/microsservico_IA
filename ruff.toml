@@ -1,0 +1,15 @@
+# Analise estatica (ruff = flake8 + pyflakes + mccabe, num binario so).
+# Rodar: ruff check .
+line-length = 120
+target-version = "py311"
+extend-exclude = ["antenv", "htmlcov"]
+
+[lint]
+select = ["E", "F", "W", "B", "SIM", "C90"]
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.per-file-ignores]
+# O prompt do Gemini e um texto longo de proposito.
+"ia_service.py" = ["E501"]

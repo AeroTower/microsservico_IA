@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
 
@@ -24,7 +23,7 @@ def test_analisar_cultivo_dados_invalidos():
         "temperatura": 24.5
     }
     response = client.post("/analisar-cultivo", json=payload)
-    assert response.status_code == 422 
+    assert response.status_code == 422
 
 # Injetamos uma API Key falsa apenas durante o teste para passar pela validação de segurança
 @patch('ia_service.API_KEY', 'chave-falsa-para-teste')
@@ -33,7 +32,7 @@ def test_analisar_cultivo_sucesso(mock_client_class):
     """Testa a rota principal simulando uma resposta de sucesso do Google Gemini"""
     mock_client_instance = MagicMock()
     mock_client_class.return_value = mock_client_instance
-    
+
     mock_response = MagicMock()
     mock_response.text = '{"status_sistema": "Normal", "diagnostico_breve": "Tudo excelente."}'
     mock_client_instance.models.generate_content.return_value = mock_response
@@ -59,7 +58,7 @@ def test_analisar_cultivo_resposta_ia_malformada(mock_client_class):
     """Testa o tratamento de erros caso o Gemini devolva texto que não é JSON válido"""
     mock_client_instance = MagicMock()
     mock_client_class.return_value = mock_client_instance
-    
+
     mock_response = MagicMock()
     mock_response.text = "Parece que a alface precisa de mais água."
     mock_client_instance.models.generate_content.return_value = mock_response
