@@ -11,3 +11,10 @@ __pycache__/
 venv/
 env/
 .venv/
+# Testes
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+relatorio-testes.xml
+.pytest_cache/
