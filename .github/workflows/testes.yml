@@ -1,0 +1,46 @@
+# Roda todos os testes em cada pull request e em cada push na main.
+# Falha se algum teste falhar ou se a cobertura ficar abaixo de 90%.
+# O resumo por tipo de teste aparece na aba Actions, e o relatorio de
+# cobertura (HTML) fica em Artifacts, como evidencia para o relatorio.
+name: Testes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"   # a mesma do deploy na Azure
+          cache: pip
+
+      - name: Dependencias
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      # O Gemini e trocado por um duble nos testes: nao precisa de chave
+      # nem gasta cota.
+      - name: Testes e cobertura
+        run: >
+          pytest --cov --cov-report=term-missing --cov-report=xml --cov-report=html
+          --junitxml=relatorio-testes.xml
+
+      - name: Resumo por tipo de teste
+        if: always()
+        run: python .github/resumo_testes.py relatorio-testes.xml coverage.xml >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Evidencias (relatorio de cobertura e resultados)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-testes-ia
+          path: |
+            htmlcov/
+            relatorio-testes.xml
+            coverage.xml
