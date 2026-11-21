@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - Hidroponia-IA
 on:
   push:
     branches:
-      - main
+      - 'main'
   workflow_dispatch:
 
 jobs:
@@ -63,9 +63,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3E86365C823E49D9A159A09EA402D917 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A4BB6912509D44A79022A0DDE0FEFE76 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BC14E3E6312B47D1814767A09F43E390 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6022D2360166466080AA3551BCBA7ED4 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_81E490884DF9495AAFE065411FC4E8A5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EF1E2D92A2EC4D3884C7ED541A39716E }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
