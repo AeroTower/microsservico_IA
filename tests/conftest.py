@@ -38,8 +38,9 @@ class GeminiFalso:
         self.resposta, self.erro, self.pedidos = resposta, erro, []
         self.models = self
 
-    def __call__(self, api_key):
-        self.api_key = api_key
+    def __call__(self, api_key, **opcoes):
+        # **opcoes: o cliente real tambem recebe http_options (versao da API).
+        self.api_key, self.opcoes = api_key, opcoes
         return self
 
     def generate_content(self, model, contents, config):
