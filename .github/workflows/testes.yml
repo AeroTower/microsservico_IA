@@ -24,6 +24,9 @@ jobs:
       - name: Dependencias
         run: pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Analise estatica (ruff)
+        run: ruff check --output-format=github .
+
       # O Gemini e trocado por um duble nos testes: nao precisa de chave
       # nem gasta cota.
       - name: Testes e cobertura

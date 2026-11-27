@@ -23,16 +23,17 @@ app.add_middleware(
 async def analisar_cultivo(dados: LeituraSensores):
     try:
         return analisar_dados_cultivo(dados)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as erro:
+        logger.warning("Resposta do Gemini não é JSON: %s", erro)
         raise HTTPException(
             status_code=500,
             detail="O serviço de inteligência artificial não retornou dados processáveis.",
-        )
-    except Exception:
+        ) from erro
+    except Exception as erro:
         # O detalhe vai so para o log (Azure > Log stream). A mensagem do erro
         # pode trazer URL, chave ou dados internos, e nao deve chegar ao app.
         logger.exception("Falha ao processar análise")
         raise HTTPException(
             status_code=500,
             detail="Falha interna ao processar a análise. Tente de novo em instantes.",
-        )
+        ) from erro
